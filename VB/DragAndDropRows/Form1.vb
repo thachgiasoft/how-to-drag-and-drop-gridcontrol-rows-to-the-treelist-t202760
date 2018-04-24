@@ -65,7 +65,7 @@ Namespace DragAndDropRows
                 Return
             End If
             Dim dragRect As New Rectangle(New Point(hitInfo.HitPoint.X - SystemInformation.DragSize.Width \ 2, hitInfo.HitPoint.Y - SystemInformation.DragSize.Height \ 2), SystemInformation.DragSize)
-            If Not (hitInfo.RowHandle = gridControl.InvalidRowHandle) AndAlso (Not dragRect.Contains(New Point(e.X, e.Y))) Then
+            If Not (hitInfo.RowHandle = GridControl.InvalidRowHandle) AndAlso Not dragRect.Contains(New Point(e.X, e.Y)) Then
                 Dim data As Object = gridView.GetRow(hitInfo.RowHandle)
                 gridControl.DoDragDrop(data, DragDropEffects.Copy)
             End If
@@ -86,22 +86,21 @@ Namespace DragAndDropRows
             If dataRow Is Nothing Then
                 Return
             End If
-            Dim parentID As Integer = DirectCast(treeList.RootValue, Integer)
+            Dim parentID As Integer = CInt((treeList.RootValue))
             ' Get the node over which the row is dropped.
             Dim node As TreeListNode = args.TargetNode
             ' Add a node at the root level.
             If node Is Nothing Then
-                Dim parentNode As TreeListNode = Nothing
-                treeList.AppendNode(New PersonEx(dataRow, parentID).ToArray(), parentNode)
+                treeList.AppendNode((New PersonEx(dataRow, parentID)).ToArray(), Nothing)
             Else
                 ' Add a child node to the target node.
-                If position = DragInsertPosition.AsChild Then
+                If position Is DragInsertPosition.AsChild Then
                     parentID = Convert.ToInt32(node.GetValue("ID"))
                     Dim targetObject() As Object = (New PersonEx(dataRow, parentID)).ToArray()
                     treeList.AppendNode(targetObject, node)
                 End If
                 ' Insert a node before the taget node.
-                If position = DragInsertPosition.Before Then
+                If position Is DragInsertPosition.Before Then
                     parentID = Convert.ToInt32(node.GetValue("ParentID"))
                     Dim targetObject() As Object = (New PersonEx(dataRow, parentID)).ToArray()
                     Dim newNode As TreeListNode = treeList.AppendNode(targetObject, node.ParentNode)
